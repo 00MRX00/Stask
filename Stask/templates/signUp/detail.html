@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}{{signUp.user_surname}}{% endblock %}
+
+{% block content %}
+
+	<p>Имя: {{signUp.user_name}}</p>
+	<p>Фамилия: {{signUp.user_surname}}</p>
+	<p>Отчество: {{signUp.user_patronymic}}</p>
+	<p>Email: {{signUp.user_email}}</p>
+	<p>Дата рождения: {{signUp.user_birthdate}}</p>
+	<p>Дата регистрации: {{signUp.user_reg_date}}</p>
+
+	{% if signUp.was_registered_recently %}
+		НОВЫЙ ПОЛЬЗОВАТЕЛЬ!
+	{% endif %}
+{% endblock %}
+
