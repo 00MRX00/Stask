@@ -5,3 +5,7 @@ body{
 h2{
     color: #a11427fd;
 }
+
+table{
+    text-align: left;
+}
