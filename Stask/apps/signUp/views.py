@@ -3,7 +3,9 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 
-from .models import User
+import hashlib
+
+from .models import User, UserLogPass
 from .forms import SignUpForm
 
 def index(request):
@@ -13,14 +15,14 @@ def index(request):
 
 def detail(request, user_id):
 	try:
-		a = User.objects.get(id = user_id)
+		user = User.objects.get(id = user_id)
+		userLogPass = UserLogPass.objects.get(user_id = user.id)
 	except:
 		raise Http404("Пользователь не найден!")
 
-	return render(request, 'signUp/detail.html', {'signUp': a})
+	return render(request, 'signUp/detail.html', {'user': user, 'userLogPass': userLogPass})
 
 def reg(request):
-	#error = ""
 	if(request.method == "POST"):
 		signUpForm = SignUpForm(request.POST)
 		if(signUpForm.is_valid()):
@@ -30,16 +32,16 @@ def reg(request):
 				"patronymic": signUpForm.cleaned_data["user_patronymic"],
 				"email": signUpForm.cleaned_data["user_email"],
 				"birthdate": signUpForm.cleaned_data["user_birthdate"],
-				"reg_date": timezone.now()
+				"reg_date": timezone.now(),
+				"password": signUpForm.cleaned_data["user_password"],
+				"conf_password": signUpForm.cleaned_data["user_conf_password"]
 			}
-			try:
-				us = User(user_name=user["name"], user_surname=user["surname"], user_patronymic=user["patronymic"], user_email=user["email"], user_birthdate=user["birthdate"], user_reg_date=user["reg_date"])
+			if(user["password"] == user["conf_password"]):
+				us = User(user_name=user["name"], user_surname=user["surname"], user_patronymic=user["patronymic"], user_birthdate=user["birthdate"], user_reg_date=user["reg_date"])
 				us.save()
-				#error = "Пользователь успешно зарегистрирован."
-			except:
-				raise Http404("Пользователь не зарегистрирован!")
-				#error = "Не удалось зарегистрировать пользователя!"
-		#else:
-			#error = "Некорректно введены данные!"
+				usLP = UserLogPass(user = us, user_email=user["email"], user_password=hashlib.sha512(str(user["password"]).encode()).hexdigest())
+				usLP.save()
+			else:
+				raise Http404("Пароли не совпадают!")
 	
 	return HttpResponseRedirect(reverse('signUp:index'))

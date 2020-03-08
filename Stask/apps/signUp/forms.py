@@ -6,3 +6,5 @@ class SignUpForm(forms.Form):
     user_patronymic = forms.CharField(label = "Отчество:", required = False, max_length = 50)
     user_email = forms.EmailField(label = "Email:", required = True, min_length = 5, max_length = 50)
     user_birthdate = forms.DateField(label = "Дата рождения:", required = True)
+    user_password = forms.CharField(widget=forms.PasswordInput(), label = "Пароль:", required = True)
+    user_conf_password = forms.CharField(widget=forms.PasswordInput(), label = "Подтвердите пароль:", required = True)
