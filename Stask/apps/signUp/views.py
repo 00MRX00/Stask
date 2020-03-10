@@ -11,8 +11,7 @@ from .forms import SignUpForm
 
 def index(request):
 	latest_users_list = User.objects.order_by('-user_reg_date')[:5]
-	signUpForm = SignUpForm()
-	return render(request, 'signUp/list.html', {'latest_users_list': latest_users_list, 'signUpForm': signUpForm})
+	return render(request, 'signUp/index.html', {'latest_users_list': latest_users_list})
 
 def detail(request, user_id):
 	try:
@@ -26,6 +25,7 @@ def detail(request, user_id):
 def reg(request):
 	if(request.method == "POST"):
 		signUpForm = SignUpForm(request.POST)
+		hasError = False
 		if(signUpForm.is_valid()):
 			user = {
 				"name": signUpForm.cleaned_data["user_name"],
@@ -66,10 +66,18 @@ def reg(request):
 				"user_password": "Пароль",
 				"user_conf_password": "Подтвердите пароль",
 			}
-			for error in signUpForm.errors:
-				messages.add_message(request, messages.ERROR, 'Поле "' + signUpFormFields[str(error)] + '" заполнено неверно!')
-					
-	return HttpResponseRedirect(reverse('signUp:index'))
+		for error in signUpForm.errors:
+			if not hasError:
+				hasError = True
+			messages.add_message(request, messages.ERROR, 'Поле "' + signUpFormFields[str(error)] + '" заполнено неверно!')
+		if hasError:
+			return HttpResponseRedirect(reverse('signUp:reg'))
+		else:
+			return HttpResponseRedirect(reverse('signUp:index'))
+	else:
+		signUpForm = SignUpForm()
+		return render(request, 'signUp/signup.html', {'signUpForm': signUpForm})
+	
 
 def authorize(request):
 	pass

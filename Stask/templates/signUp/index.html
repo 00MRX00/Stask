@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Добро пожаловать в Stask{% endblock %}
+
+{% block content %}
+	{% if messages %}
+	<ul class="messages">
+		{% for message in messages %}
+			{% if message.tags != "error" %}
+				<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+			{% endif %}
+		{% endfor %}
+	</ul>
+	{% endif %}
+	<h3>Список зарегистрированных пользователей</h3>
+	{% if latest_users_list %}
+		<ul>
+			{% for el in latest_users_list %}
+				<li>{{el.user_surname}} {{el.user_name}} {{el.user_patronymic}}</li><br>
+			{% endfor %}
+		</ul>
+	{% else %}
+		Пользователи не найдены
+	{% endif %}
+
+{% endblock %}

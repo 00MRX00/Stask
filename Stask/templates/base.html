@@ -4,9 +4,20 @@
 <head>
 	<meta charset="UTF-8">
 	<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
-	<title>{% block title %}Мой сайт{% endblock %}</title>
+	<title>{% block title %}Stask{% endblock %}</title>
 </head>
 <body>
+	<h1>Stask</h1>
+	<hr>
+	<a href="{% url 'signUp:index' %}">Домой</a>
+	 <!-- if user.is_authenticated  -->
+		<!-- <a href="{ url 'password_change' }">Сменить пароль</a> -->
+		<!-- <a href="{ url 'logout' }">Выйти</a> -->
+	 <!-- else  -->
+		<a href="{% url 'signUp:reg' %}">Регистрация</a>
+		<!-- <a href="{ url 'login' }">Авторизация</a> -->
+	 <!-- endif  -->
+	<hr>
 	{% block content %}{% endblock %}
 	<script src="{% static 'js/script.js' %}"></script>
 </body>
