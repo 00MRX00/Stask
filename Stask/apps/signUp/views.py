@@ -39,7 +39,7 @@ def reg(request):
 			}
 			if(re.compile('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-_]).{8,}$').search(user["password"])):
 				if(user["password"] == user["conf_password"]):
-					allUsers = UserLogPass.objects.get(user_email=user["email"])
+					allUsers = UserLogPass.objects.filter(user_email=user["email"])
 					if(not allUsers):
 						try:
 							us = User(user_name=user["name"], user_surname=user["surname"], user_patronymic=user["patronymic"], user_birthdate=user["birthdate"], user_reg_date=user["reg_date"])
@@ -70,3 +70,6 @@ def reg(request):
 				messages.add_message(request, messages.ERROR, 'Поле "' + signUpFormFields[str(error)] + '" заполнено неверно!')
 					
 	return HttpResponseRedirect(reverse('signUp:index'))
+
+def authorize(request):
+	pass
