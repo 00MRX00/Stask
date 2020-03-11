@@ -17,5 +17,14 @@
 
 		<input type="submit" value="Войти" >
 	</form>
+	{% if messages %}
+	<ul class="messages">
+		{% for message in messages %}
+			{% if message.tags == "error" %}
+				<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+			{% endif %}
+		{% endfor %}
+	</ul>
+	{% endif %}
 
 {% endblock %}

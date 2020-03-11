@@ -3,6 +3,8 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib import messages
+from django.contrib.sessions.models import Session
+from django.core import serializers
 
 import hashlib, re
 
@@ -24,10 +26,10 @@ def detail(request, user_id):
 	return render(request, 'signUp/detail.html', {'user': user, 'userLogPass': userLogPass})
 
 def reg(request):
-	if(request.method == "POST"):
+	if request.method == "POST":
 		signUpForm = SignUpForm(request.POST)
 		hasError = False
-		if(signUpForm.is_valid()):
+		if signUpForm.is_valid():
 			user = {
 				"name": signUpForm.cleaned_data["user_name"],
 				"surname": signUpForm.cleaned_data["user_surname"],
@@ -38,7 +40,7 @@ def reg(request):
 				"password": signUpForm.cleaned_data["user_password"],
 				"conf_password": signUpForm.cleaned_data["user_conf_password"]
 			}
-			if(re.compile('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-_]).{8,}$').search(user["password"])):
+			if re.compile('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-_]).{8,}$').search(user["password"]):
 				if(user["password"] == user["conf_password"]):
 					allUsers = UserLogPass.objects.filter(user_email=user["email"])
 					if(not allUsers):
@@ -84,5 +86,34 @@ def reg(request):
 	
 
 def log(request):
-	signInForm = SignInForm(request.POST)
-	return render(request, 'signUp/signin.html', {'signInForm': signInForm})
+	if request.method == "POST":
+		signInForm = SignInForm(request.POST)
+		hasError = False
+		if signInForm.is_valid():
+			form = {
+					"email": signInForm.cleaned_data["user_email"],
+					"password": signInForm.cleaned_data["user_password"]
+				}
+		searchUser = UserLogPass.objects.filter(user_email=form["email"])
+		if searchUser:
+			hashPass = hashlib.sha512(str(form["password"]).encode()).hexdigest()
+			if hashPass == searchUser[0].user_password:
+				currentUser = User.objects.get(pk=searchUser[0].user_id)
+				request.session["currentUser"] = currentUser.jsonEncoder()
+				messages.add_message(request, messages.SUCCESS, 'Авторизация прошла успешно')
+			else:
+				messages.add_message(request, messages.ERROR, 'Неверный пароль')
+		else:
+			messages.add_message(request, messages.ERROR, 'Пользователь с таким "Email" не зарегистрирован')
+		for mes in messages.get_messages(request):
+			if mes.tags == "error":
+				hasError = True
+				break
+		messages.get_messages(request).used = False
+		if hasError:
+			return HttpResponseRedirect(reverse('signUp:log'))
+		else:
+			return HttpResponseRedirect(reverse('signUp:index'))
+	else:
+		signInForm = SignInForm()
+		return render(request, 'signUp/signin.html', {'signInForm': signInForm})

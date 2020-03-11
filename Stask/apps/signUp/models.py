@@ -1,4 +1,4 @@
-import datetime
+import datetime, json
 from django.db import models
 
 from django.utils import timezone
@@ -20,6 +20,17 @@ class User(models.Model):
 
 	def was_registered_recently(self):
 		return self.user_reg_date >= (timezone.now() - datetime.timedelta(days = 1))
+
+	def jsonEncoder(self):
+		us = {
+			"user_name" : str(self.user_name),
+			"user_surname" : str(self.user_surname),
+			"user_patronymic" : str(self.user_patronymic),
+			"user_birthdate" : str(self.user_birthdate),
+			"user_reg_date" : str(self.user_reg_date),
+			"user_type" : str(self.user_type)
+		}
+		return json.dumps(us)
 
 	class Meta:
 		verbose_name = 'Пользователь'
