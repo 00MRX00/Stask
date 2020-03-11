@@ -7,10 +7,11 @@ from django.contrib import messages
 import hashlib, re
 
 from .models import User, UserLogPass
-from .forms import SignUpForm
+from .forms import SignUpForm, SignInForm
 
 def index(request):
-	latest_users_list = User.objects.order_by('-user_reg_date')[:5]
+	latest_users_list = User.objects.order_by('-user_reg_date')
+	# latest_users_list = User.objects.all()
 	return render(request, 'signUp/index.html', {'latest_users_list': latest_users_list})
 
 def detail(request, user_id):
@@ -67,9 +68,12 @@ def reg(request):
 				"user_conf_password": "Подтвердите пароль",
 			}
 		for error in signUpForm.errors:
-			if not hasError:
-				hasError = True
 			messages.add_message(request, messages.ERROR, 'Поле "' + signUpFormFields[str(error)] + '" заполнено неверно!')
+		for mes in messages.get_messages(request):
+			if mes.tags == "error":
+				hasError = True
+				break
+		messages.get_messages(request).used = False
 		if hasError:
 			return HttpResponseRedirect(reverse('signUp:reg'))
 		else:
@@ -79,5 +83,6 @@ def reg(request):
 		return render(request, 'signUp/signup.html', {'signUpForm': signUpForm})
 	
 
-def authorize(request):
-	pass
+def log(request):
+	signInForm = SignInForm(request.POST)
+	return render(request, 'signUp/signin.html', {'signInForm': signInForm})

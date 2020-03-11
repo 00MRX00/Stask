@@ -15,7 +15,7 @@
 		<!-- <a href="{ url 'logout' }">Выйти</a> -->
 	 <!-- else  -->
 		<a href="{% url 'signUp:reg' %}">Регистрация</a>
-		<!-- <a href="{ url 'login' }">Авторизация</a> -->
+		<a href="{% url 'signUp:log' %}">Авторизация</a>
 	 <!-- endif  -->
 	<hr>
 	{% block content %}{% endblock %}

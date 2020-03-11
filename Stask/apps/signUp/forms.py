@@ -8,3 +8,7 @@ class SignUpForm(forms.Form):
     user_birthdate = forms.DateField(label = "Дата рождения:", required = True)
     user_password = forms.CharField(widget=forms.PasswordInput(), label = "Пароль:", required = True)
     user_conf_password = forms.CharField(widget=forms.PasswordInput(), label = "Подтвердите пароль:", required = True)
+
+class SignInForm(forms.Form):
+    user_email = forms.EmailField(label = "Email:")
+    user_password = forms.CharField(widget=forms.PasswordInput(), label = "Пароль:")

@@ -12,7 +12,10 @@ class User(models.Model):
 	user_type = models.CharField('Тип пользователя', max_length = 50, default = "user")
 
 	def __str__(self):
-		string = self.user_surname + " " + str(self.user_name)[0] + "." + str(self.user_patronymic)[0] + "." 
+		if self.user_patronymic:
+			string = self.user_surname + " " + str(self.user_name)[0] + "." +  str(self.user_patronymic)[0] + "." 
+		else:
+			string = self.user_surname + " " + str(self.user_name)[0] + "." 
 		return string
 
 	def was_registered_recently(self):

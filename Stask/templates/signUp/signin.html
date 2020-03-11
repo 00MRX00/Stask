@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Авторизация{% endblock %}
+
+{% block content %}
+    
+	<h2>Авторизация</h2>
+
+	
+	<form action="{% url 'signUp:log'%}" method="POST">
+		
+		{% csrf_token %}
+	
+		<table>
+			{{ signInForm.as_table }}
+		</table>
+
+		<input type="submit" value="Войти" >
+	</form>
+
+{% endblock %}
