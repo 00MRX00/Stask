@@ -4,17 +4,21 @@ from django.urls import reverse
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.sessions.models import Session
-from django.core import serializers
 
-import hashlib, re
+import hashlib, re, json
 
 from .models import User, UserLogPass
 from .forms import SignUpForm, SignInForm
 
 def index(request):
 	latest_users_list = User.objects.order_by('-user_reg_date')
-	# latest_users_list = User.objects.all()
-	return render(request, 'signUp/index.html', {'latest_users_list': latest_users_list})
+	currentUser = ""
+	if "currentUser" in request.session:
+		currentUser = request.session["currentUser"]
+		return render(request, 'signUp/index.html', {'latest_users_list': latest_users_list, 'currentUser': currentUser})
+	else:
+		return render(request, 'signUp/index.html', {'latest_users_list': latest_users_list})
+
 
 def detail(request, user_id):
 	try:
@@ -26,6 +30,8 @@ def detail(request, user_id):
 	return render(request, 'signUp/detail.html', {'user': user, 'userLogPass': userLogPass})
 
 def reg(request):
+	if "currentUser" in request.session:
+		return HttpResponseRedirect(reverse('signUp:index'))
 	if request.method == "POST":
 		signUpForm = SignUpForm(request.POST)
 		hasError = False
@@ -86,6 +92,8 @@ def reg(request):
 	
 
 def log(request):
+	if "currentUser" in request.session:
+		return HttpResponseRedirect(reverse('signUp:index'))
 	if request.method == "POST":
 		signInForm = SignInForm(request.POST)
 		hasError = False
@@ -117,3 +125,7 @@ def log(request):
 	else:
 		signInForm = SignInForm()
 		return render(request, 'signUp/signin.html', {'signInForm': signInForm})
+
+def logout(request):
+	request.session.clear()
+	return HttpResponseRedirect(reverse('signUp:index'))

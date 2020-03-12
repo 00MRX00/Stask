@@ -10,13 +10,13 @@
 	<h1>Stask</h1>
 	<hr>
 	<a href="{% url 'signUp:index' %}">Домой</a>
-	 <!-- if user.is_authenticated  -->
-		<!-- <a href="{ url 'password_change' }">Сменить пароль</a> -->
-		<!-- <a href="{ url 'logout' }">Выйти</a> -->
-	 <!-- else  -->
+	{% if currentUser %}
+		<a href="#">Сменить пароль</a>
+		<a href="{% url 'signUp:logout' %}">Выйти</a>
+	{% else %}
 		<a href="{% url 'signUp:reg' %}">Регистрация</a>
 		<a href="{% url 'signUp:log' %}">Авторизация</a>
-	 <!-- endif  -->
+	{% endif %}
 	<hr>
 	{% block content %}{% endblock %}
 	<script src="{% static 'js/script.js' %}"></script>
