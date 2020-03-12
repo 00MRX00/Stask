@@ -12,3 +12,9 @@ class SignUpForm(forms.Form):
 class SignInForm(forms.Form):
     user_email = forms.CharField(label = "Email:", max_length = 50)
     user_password = forms.CharField(widget=forms.PasswordInput(), label = "Пароль:")
+
+class PassChangeForm(forms.Form):
+    user_cur_password = forms.CharField(widget=forms.PasswordInput(), label = "Старый пароль:")
+    user_new_password = forms.CharField(widget=forms.PasswordInput(), label = "Новый пароль:")
+    user_new_password2 = forms.CharField(widget=forms.PasswordInput(), label = "Подтвердите пароль:")
+        

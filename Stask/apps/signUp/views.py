@@ -8,13 +8,13 @@ from django.contrib.sessions.models import Session
 import hashlib, re, json
 
 from .models import User, UserLogPass
-from .forms import SignUpForm, SignInForm
+from .forms import SignUpForm, SignInForm, PassChangeForm
 
 def index(request):
 	latest_users_list = User.objects.order_by('-user_reg_date')
 	currentUser = ""
 	if "currentUser" in request.session:
-		currentUser = request.session["currentUser"]
+		currentUser = json.loads(request.session["currentUser"])
 		return render(request, 'signUp/index.html', {'latest_users_list': latest_users_list, 'currentUser': currentUser})
 	else:
 		return render(request, 'signUp/index.html', {'latest_users_list': latest_users_list})
@@ -129,3 +129,46 @@ def log(request):
 def logout(request):
 	request.session.clear()
 	return HttpResponseRedirect(reverse('signUp:index'))
+
+def password_change(request):
+	if "currentUser" not in request.session:
+		return HttpResponseRedirect(reverse('signUp:index'))
+	if request.method == "POST":
+		passChangeForm = PassChangeForm(request.POST)
+		hasError = False
+		if passChangeForm.is_valid():
+			passes = {
+				"cur_password": passChangeForm.cleaned_data["user_cur_password"],
+				"new_password": passChangeForm.cleaned_data["user_new_password"],
+				"new_password2": passChangeForm.cleaned_data["user_new_password2"],
+			}
+			hashPass = hashlib.sha512(str(passes["new_password"]).encode()).hexdigest()
+			us = json.loads(request.session["currentUser"])
+			usLP = UserLogPass.objects.get(user_id = us.id)
+			if usLP["user_password"] == hashPass:
+				if(passes["new_password"] == passes["new_password2"]):
+					if re.compile('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-_]).{8,}$').search(passes["new_password"]):
+						try:
+							usLP.user_password = hashPass
+							usLP.save()
+							messages.add_message(request, messages.SUCCESS, 'Пароль успешно изменен')
+						except:
+							messages.add_message(request, messages.ERROR, 'Ошибка смены пароля!')
+					else:
+						messages.add_message(request, messages.ERROR, 'Пароль слишком простой! В пароле должно быть хотя бы 8 символов, 1 заглавная английская буква, 1 строчная английская буква, 1 цифра и 1 спец. символ (#,?,!,@,$, ,%,^,&,*,-,_)')
+				else:
+						messages.add_message(request, messages.ERROR, 'Пароли не совпадают!')
+			else:
+				messages.add_message(request, messages.ERROR, 'Неправильно введен текущий пароль!')
+		for mes in messages.get_messages(request):
+			if mes.tags == "error":
+				hasError = True
+				break
+		messages.get_messages(request).used = False
+		if hasError:
+			return HttpResponseRedirect(reverse('signUp:password_change'))
+		else:
+			return HttpResponseRedirect(reverse('signUp:index'))
+	else:
+		passChangeForm = PassChangeForm()
+		return render(request, 'signUp/password_change.html', {'passChangeForm': passChangeForm})

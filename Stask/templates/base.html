@@ -11,7 +11,7 @@
 	<hr>
 	<a href="{% url 'signUp:index' %}">Домой</a>
 	{% if currentUser %}
-		<a href="#">Сменить пароль</a>
+		<a href="{% url 'signUp:password_change' %}">Сменить пароль</a>
 		<a href="{% url 'signUp:logout' %}">Выйти</a>
 	{% else %}
 		<a href="{% url 'signUp:reg' %}">Регистрация</a>
