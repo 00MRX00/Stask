@@ -142,10 +142,10 @@ def password_change(request):
 				"new_password": passChangeForm.cleaned_data["user_new_password"],
 				"new_password2": passChangeForm.cleaned_data["user_new_password2"],
 			}
-			hashPass = hashlib.sha512(str(passes["new_password"]).encode()).hexdigest()
+			hashPass = hashlib.sha512(str(passes["cur_password"]).encode()).hexdigest()
 			us = json.loads(request.session["currentUser"])
-			usLP = UserLogPass.objects.get(user_id = us.id)
-			if usLP["user_password"] == hashPass:
+			usLP = UserLogPass.objects.get(user_id = us["user_id"])
+			if usLP.user_password == hashPass:
 				if(passes["new_password"] == passes["new_password2"]):
 					if re.compile('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-_]).{8,}$').search(passes["new_password"]):
 						try:

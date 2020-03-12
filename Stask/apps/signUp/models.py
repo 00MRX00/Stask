@@ -4,6 +4,7 @@ from django.db import models
 from django.utils import timezone
 
 class User(models.Model):
+	id = models.AutoField(primary_key=True)
 	user_name = models.CharField('Имя пользователя', max_length = 50)
 	user_surname = models.CharField('Фамилия пользователя', max_length = 50)
 	user_patronymic = models.CharField('Отчество пользователя', max_length = 50)
@@ -23,6 +24,7 @@ class User(models.Model):
 
 	def jsonEncoder(self):
 		us = {
+			"user_id": str(self.id),
 			"user_name" : str(self.user_name),
 			"user_surname" : str(self.user_surname),
 			"user_patronymic" : str(self.user_patronymic),
